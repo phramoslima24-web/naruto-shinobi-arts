@@ -1,0 +1,26 @@
+name: build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.8
+      - name: Verifica o JAR do Narutoto
+        run: |
+          if [ ! -f "libs/narutoto-0.4.1.jar" ]; then
+            echo "Dependência ausente: libs/narutoto-0.4.1.jar"
+            exit 1
+          fi
+      - name: Build
+        run: gradle build --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: narutoto-expansion
+          path: build/libs/*.jar
